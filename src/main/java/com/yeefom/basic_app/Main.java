@@ -1,6 +1,5 @@
 package com.yeefom.basic_app;
 
-
 import com.google.inject.Guice;
 import com.yeefom.basic_app.app.App;
 import com.yeefom.basic_app.app.AppModule;

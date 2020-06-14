@@ -31,10 +31,21 @@ public class GithubClient implements Client{
         .build();
 
     return client.sendAsync(request, HttpResponse.BodyHandlers.ofString())
-        .thenApply(HttpResponse::body)
-        .thenApply(body -> {
+        .thenApply(res -> {
+          if (res.statusCode() == 200) {
+            return res;
+          }
+
+          if (res.statusCode() == 404) {
+            throw new CompletionException(new RuntimeException("User not found"));
+          }
+
+          throw new CompletionException(
+              new RuntimeException("Received error from GitHub: " + res.statusCode() + " " + res.body()));
+        })
+        .thenApply(res -> {
           try {
-            return mapper.readValue(body, new TypeReference<>(){});
+            return mapper.readValue(res.body(), new TypeReference<>(){});
           } catch (JsonProcessingException e) {
             e.printStackTrace();
             throw new CompletionException(e);
